@@ -1,0 +1,54 @@
+# === Środowiska i IDE ===
+.idea/
+.vscode/
+venv/
+ENV/
+env/
+.venv/
+
+# === Python cache ===
+__pycache__/
+**/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# === Kompilowane / pakiety ===
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# === Testy / raporty ===
+.pytest_cache/
+.coverage
+coverage.xml
+htmlcov/
+
+# === Mypy / Pylint ===
+.mypy_cache/
+.dmypy.json
+.pyre/
+.pylint.d/
+
+# === Logi ===
+*.log
+
+# === Pliki konfiguracyjne środowiska ===
+*.env
+*.env.*
+.envrc
+
+# === Dane (Twoje wymaganie) ===
+data/
+
+# === Systemowe ===
+.DS_Store
+Thumbs.db
+
+# === Inne opcjonalne ===
+# Jeśli używasz Jupyter Notebook:
+.ipynb_checkpoints/
+
+# Jeśli używasz poetry:
+.poetry/
