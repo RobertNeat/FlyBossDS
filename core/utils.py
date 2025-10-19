@@ -27,7 +27,6 @@ def _detect_indent_width(parent):
 def get_indent(node):
     parent = node.getparent()
     if parent is None:
-        # korzeń
         return ("", "    ")
     base_width = _detect_indent_width(parent)
     prev = None
@@ -95,7 +94,7 @@ def element_to_comment(el):
     raw_xml = etree.tostring(el, encoding="unicode", with_tail=False)
     indent_for_node, _ = get_indent(el)
     comment_text = f"<!--\n{indent_for_node}{raw_xml}\n{indent_for_node}-->"
-    new_comment = etree.Comment(comment_text[4:-3])  # tniemy <!-- i -->
+    new_comment = etree.Comment(comment_text[4:-3])
     parent.remove(el)
     parent.insert(idx, new_comment)
     new_comment.tail = old_tail
