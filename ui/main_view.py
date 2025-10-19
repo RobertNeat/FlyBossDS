@@ -220,7 +220,7 @@ class MainView(ctk.CTkFrame):
             msg.append("")
         if unchanged:
             msg.append("Pominięto (brak wybranego URL i/lub użytkownika):")
-            msg += [f" ⚠ {os.path.basename(x)}" for x in unchanged]
+            msg += [f" ❌ {os.path.basename(x)}" for x in unchanged]
             msg.append("")
 
         if backups:
@@ -256,17 +256,28 @@ class MainView(ctk.CTkFrame):
 
         try:
             bkp = self.processor.apply_changes_to_file(path, target_url, target_user)
-            parts = []
-            if target_url and has_url:
-                parts.append("URL")
-            if target_user and has_user:
-                parts.append("użytkownika")
-            info = " i ".join(parts) if parts else "konfigurację"
-            messagebox.showinfo(APP_NAME,
-                                f"Zmieniono {info} w pliku:\n{os.path.basename(path)}\n\nKopia: {os.path.basename(bkp)}")
         except Exception as e:
             messagebox.showerror(APP_NAME, f"Błąd zapisu: {e}")
+            return
 
+        msg_lines = [f"W pliku {os.path.basename(path)} zmieniono:"]
+
+        if target_url:
+            if has_url:
+                msg_lines.append("✅ URL (poprawnie)")
+            else:
+                msg_lines.append("❌ URL (brak w pliku)")
+        if target_user:
+            if has_user:
+                msg_lines.append("✅ Użytkownika (poprawnie)")
+            else:
+                msg_lines.append("❌ Użytkownika (brak w pliku)")
+
+        if bkp:
+            msg_lines.append("")
+            msg_lines.append(f"Kopia: {os.path.basename(bkp)}")
+
+        messagebox.showinfo(APP_NAME, "\n".join(msg_lines))
 
     def preview_one(self):
         sel = self.files_list.curselection()
