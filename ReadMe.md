@@ -76,6 +76,8 @@ FlyBossDS to narzędzie GUI do zarządzania plikami datasource JBoss/WildFly. Po
 
 ## Wymagania techniczne
 Python 3.14+ (działa również na 3.10 – 3.13)
+^ (end of support  2030-10)
+
 
 Instalacja zależności:
 ```
