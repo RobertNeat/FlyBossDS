@@ -1,8 +1,9 @@
 import os
+import subprocess
+import sys
 import tkinter as tk
 from tkinter import filedialog, messagebox
 import customtkinter as ctk
-
 
 class SettingsView(ctk.CTkFrame):
     def __init__(self, master, settings, on_paths_changed, on_theme_changed):
@@ -106,6 +107,11 @@ class SettingsView(ctk.CTkFrame):
         self.backup_limit_entry = ctk.CTkEntry(backup_frame, textvariable=self.backup_limit_var, width=100)
         self.backup_limit_entry.grid(row=1, column=1, padx=(0, 10), pady=(4, 10), sticky="w")
         ctk.CTkButton(backup_frame, text="Zapisz ustawienia kopii", command=self._save_backup_settings).grid(row=1, column=2, padx=10, pady=(4, 10))
+        ctk.CTkButton(
+            backup_frame,
+            text="Otwórz folder kopii…",
+            command=self._open_backup_dir
+        ).grid(row=2, column=2, padx=10, pady=(4, 10))
 
         self._reload_paths()
 
@@ -242,3 +248,18 @@ class SettingsView(ctk.CTkFrame):
         self.settings.data["backup_limit"] = blimit
         self.settings.save()
         messagebox.showinfo("Ustawienia", "Zapisano ustawienia kopii zapasowych.")
+
+    def _open_backup_dir(self):
+        from config.settings_manager import CONFIG_DIR
+        bdir = self.settings.data.get("backup_dir", "")
+        if not bdir:
+            bdir = os.path.join(CONFIG_DIR, "backups")
+
+        os.makedirs(bdir, exist_ok=True)
+
+        if sys.platform.startswith("win"):
+            os.startfile(bdir)
+        elif sys.platform == "darwin":  # macOS
+            subprocess.Popen(["open", bdir])
+        else:
+            subprocess.Popen(["xdg-open", bdir])
