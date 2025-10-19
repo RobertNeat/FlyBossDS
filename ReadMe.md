@@ -5,6 +5,11 @@ FlyBossDS to narzędzie GUI do zarządzania plikami datasource JBoss/WildFly. Po
 
 ## Główne funkcjonalności
 
+<img width="754" height="496" alt="image" src="https://github.com/user-attachments/assets/911d6fea-1a27-4202-a131-77c8ce3ba3cc" />
+
+<img width="800" height="670" alt="image" src="https://github.com/user-attachments/assets/c7413e8f-2acc-41cf-b6e6-9be0e173a4e0" />
+
+
 ### 1. Parsowanie i normalizacja XML
 - Obsługa aktywnych i zakomentowanych konfiguracji.
 - Zamiana konfiguracji na komentarze blokowe:
