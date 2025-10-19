@@ -9,11 +9,7 @@ from .backup import backup_file
 
 
 class XMLProcessor:
-    # ===== Odczyt informacji =====
     def collect_urls_and_users(self, path):
-        """
-        Zwraca (urls:list[str], users:list[str]) z pojedynczego pliku.
-        """
         tree = read_xml(path)
         root = tree.getroot()
         urls = set()
@@ -47,12 +43,7 @@ class XMLProcessor:
 
         return sorted(urls), sorted(users)
 
-    # ===== Modyfikacje =====
     def _ensure_target_connection_url_exists(self, root, target_url):
-        """
-        Jeśli target_url nie istnieje jako aktywny <connection-url>,
-        wstawia nowy element w pierwszym napotkanym <datasource>.
-        """
         urls = list(findall_any_ns(root, "connection-url"))
         exists = any((u.text or "").strip() == target_url for u in urls)
         if exists:
@@ -81,10 +72,6 @@ class XMLProcessor:
 
 
     def _ensure_target_connection_url_exists(self, root, target_url):
-        """
-        Jeśli target_url nie istnieje jako aktywny <connection-url>,
-        wstawia nowy element w pierwszym napotkanym <datasource>.
-        """
         urls = list(findall_any_ns(root, "connection-url"))
         exists = any((u.text or "").strip() == target_url for u in urls)
         if exists:
@@ -111,7 +98,6 @@ class XMLProcessor:
 
 
     def activate_connection_url(self, tree, target_url):
-        """Odkomentowuje docelowy URL; inne URL-e zamienia na komentarze."""
         root = tree.getroot()
 
         # 1) odkomentowanie z komentarza (jeśli target jest w komentarzu)
@@ -132,7 +118,6 @@ class XMLProcessor:
                 element_to_comment(u)
 
     def activate_user(self, tree, target_username):
-        """Odkomentowuje blok <security> z danym userem; inne bloki security komentuje blokowo."""
         if not target_username:
             return
         root = tree.getroot()
@@ -153,12 +138,6 @@ class XMLProcessor:
                 element_to_comment(s)
 
     def apply_changes_to_file(self, path, target_url, target_username):
-        """
-        Wykonuje modyfikacje na pojedynczym pliku:
-        1) NORMALIZACJA STRUKTURY (ładne komentarze blokowe, wcięcia)
-        2) Aktywacja URL i USER
-        3) Backup → Zapis
-        """
         tree = read_xml(path)
         # KROK 1: Normalizacja
         normalize_xml_structure(tree)
@@ -171,7 +150,6 @@ class XMLProcessor:
         return bkp
 
     def activate_connection_url(self, tree, target_url):
-        """Odkomentowuje docelowy URL; inne URL-e zamienia na komentarze (blokowe)."""
         root = tree.getroot()
 
         # 1) Odkomentuj z komentarza odpowiedni <connection-url>

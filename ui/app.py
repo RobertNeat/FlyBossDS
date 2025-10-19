@@ -6,11 +6,6 @@ from .settings_view import SettingsView
 
 
 class App(ctk.CTk):
-    """
-    Główne okno aplikacji, nawigacja pomiędzy widokami:
-    - Główny (zbiorcza zmiana URL / user)
-    - Ustawienia (zarządzanie ścieżkami, motywem)
-    """
     def __init__(self):
         super().__init__()
         self.title(APP_NAME)

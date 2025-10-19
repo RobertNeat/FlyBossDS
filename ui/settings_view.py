@@ -5,13 +5,6 @@ import customtkinter as ctk
 
 
 class SettingsView(ctk.CTkFrame):
-    """
-    Widok ustawień:
-    - lista ścieżek XML z możliwością dodawania (pliki/folder), edycji, usuwania,
-    - wklejanie ścieżki ręcznie,
-    - (opcjonalnie) drag&drop, jeśli dostępny tkinterdnd2,
-    - zmiana motywu (System/Dark/Light) i schematu koloru (blue).
-    """
     def __init__(self, master, settings, on_paths_changed, on_theme_changed):
         super().__init__(master)
         self.settings = settings
@@ -21,12 +14,10 @@ class SettingsView(ctk.CTkFrame):
         self.columnconfigure(0, weight=1)
         self.rowconfigure(1, weight=1)
 
-        # Nagłówek
         ctk.CTkLabel(self, text="Ustawienia", font=ctk.CTkFont(size=18, weight="bold")).grid(
             row=0, column=0, sticky="w", padx=10, pady=(10, 0)
         )
 
-        # Panel główny (lista ścieżek)
         list_frame = ctk.CTkFrame(self)
         list_frame.grid(row=1, column=0, sticky="nsew", padx=10, pady=10)
         list_frame.rowconfigure(0, weight=1)
@@ -44,7 +35,6 @@ class SettingsView(ctk.CTkFrame):
         ctk.CTkButton(btns, text="Usuń zaznaczone", fg_color="#8b0000", hover_color="#a40000",
                       command=self._remove_selected).pack(fill="x", pady=8)
 
-        # Wklejenie ścieżki
         paste_frame = ctk.CTkFrame(self)
         paste_frame.grid(row=2, column=0, sticky="ew", padx=10, pady=(0, 10))
         paste_frame.columnconfigure(1, weight=1)
@@ -53,10 +43,8 @@ class SettingsView(ctk.CTkFrame):
         self.path_entry.grid(row=0, column=1, padx=(0, 10), pady=10, sticky="ew")
         ctk.CTkButton(paste_frame, text="Dodaj", command=self._add_from_entry).grid(row=0, column=2, padx=10, pady=10)
 
-        # Drag&Drop (opcjonalnie, jeśli tkinterdnd2)
         self._setup_optional_dnd()
 
-        # Motyw
         theme_frame = ctk.CTkFrame(self)
         theme_frame.grid(row=3, column=0, sticky="ew", padx=10, pady=(0, 10))
         ctk.CTkLabel(theme_frame, text="Motyw:", width=80).pack(side="left", padx=10, pady=10)
@@ -80,13 +68,11 @@ class SettingsView(ctk.CTkFrame):
         )
         self.color_theme_menu.pack(side="left", padx=6, pady=10)
 
-        # Podpowiedź
         ctk.CTkLabel(self, text="Domyślnie: System + blue (ciemne tło w trybie system-dark).",
                      font=ctk.CTkFont(size=11, slant="italic")).grid(row=4, column=0, sticky="w", padx=12, pady=(0, 10))
 
         self._reload_paths()
 
-    # ===== DnD (opcjonalnie) =====
     def _setup_optional_dnd(self):
         try:
             import tkinterdnd2  # noqa: F401
@@ -122,8 +108,6 @@ class SettingsView(ctk.CTkFrame):
         self.settings.add_paths(items)
         self._reload_paths()
         self.on_paths_changed()
-
-    # ===== Lista ścieżek =====
 
     def _reload_paths(self):
         self.paths_list.delete(0, tk.END)
@@ -179,8 +163,6 @@ class SettingsView(ctk.CTkFrame):
             self._reload_paths()
             self.path_entry.delete(0, tk.END)
             self.on_paths_changed()
-
-    # ===== Motyw =====
 
     def _change_appearance(self, _value):
         import customtkinter as ctk

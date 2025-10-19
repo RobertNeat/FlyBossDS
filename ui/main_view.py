@@ -11,13 +11,6 @@ from core.utils import deep_clone_tree
 
 
 class MainView(ctk.CTkFrame):
-    """
-    Widok główny:
-    - zbiera unikalne URL-e i użytkowników z dodanych plików,
-    - pozwala wybrać docelowy URL oraz użytkownika,
-    - zastosowuje zmiany do wszystkich plików,
-    - podgląd efektu dla pojedynczego pliku (bez zapisu).
-    """
     def __init__(self, master, settings, processor: XMLProcessor):
         super().__init__(master)
         self.settings = settings

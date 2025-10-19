@@ -13,14 +13,7 @@ DEFAULT_SETTINGS = {
     "last_username": "",
 }
 
-
 class SettingsManager:
-    """
-    Zarządza odczytem i zapisem ustawień aplikacji:
-    - lista ścieżek do plików XML
-    - motyw (System/Dark/Light) i schemat kolorów (blue)
-    - ostatnio użyty URL i użytkownik
-    """
     def __init__(self):
         os.makedirs(CONFIG_DIR, exist_ok=True)
         if not os.path.exists(CONFIG_PATH):
@@ -62,7 +55,6 @@ class SettingsManager:
         self.save()
 
     def replace_path(self, old, new):
-        """Podmienia jedną ścieżkę na inną (walidacja, że XML istnieje)."""
         new = os.path.abspath(new.strip('"').strip("'"))
         if not (os.path.isfile(new) and new.lower().endswith(".xml")):
             raise ValueError("Ścieżka nie wskazuje na istniejący plik XML.")

@@ -12,10 +12,6 @@ def findall_any_ns(root, local_name: str):
     return root.findall(f".//{{*}}{local_name}")
 
 def _detect_indent_width(parent):
-    """
-    Heurystyka: spróbuj odczytać szerokość wcięcia z .text/.tail dzieci/rodzica.
-    Zwraca ilość spacji, domyślnie 4.
-    """
     # Priorytet: pierwsze dziecko -> jego .tail lub .text
     for ch in parent:
         sample = (ch.tail or ch.text or "")
@@ -32,11 +28,6 @@ def _detect_indent_width(parent):
     return 4
 
 def get_indent(node):
-    """
-    Zwraca (indent_for_node, indent_for_children) jako string spacji.
-    - indent_for_node: ile wcięcia powinno poprzedzać node (na tej samej głębokości)
-    - indent_for_children: wcięcie dla wnętrza node (o jeden poziom głębiej)
-    """
     parent = node.getparent()
     if parent is None:
         # korzeń
@@ -68,15 +59,9 @@ def get_indent(node):
 
 
 def _serialize_element_compact(el):
-    """Serializuje element bez deklaracji XML, unicode, bez pretty_print (zachowamy kontrolę sami)."""
     return etree.tostring(el, encoding="unicode", with_tail=False)
 
 def _serialize_element_pretty(el, indent_child):
-    """
-    Serializuje element w trybie 'pretty' dla wnętrza komentarza blokowego.
-    - Dla elementu bez dzieci: jedna linia.
-    - Dla elementu z dziećmi: wielolinijkowo z wcięciem indent_child.
-    """
     if len(el) == 0 and (el.text or "").strip():
         # prosta postać <tag>txt</tag>
         return _serialize_element_compact(el)
@@ -104,13 +89,6 @@ def _serialize_element_pretty(el, indent_child):
     return "\n".join(lines)
 
 def _make_block_comment_text(el, indent_for_node, indent_for_children):
-    """
-    Tworzy treść komentarza blokowego:
-    <!--
-    <tag>...</tag>
-    -->
-    z zachowaniem ładnych wcięć wewnątrz.
-    """
     # jeżeli el nie ma dzieci i nie ma \n w środku – skrótowo jedna linia w środku
     if len(el) == 0 and not ((el.text or "").strip().find("\n") >= 0):
         inner = _serialize_element_compact(el)
@@ -122,38 +100,34 @@ def _make_block_comment_text(el, indent_for_node, indent_for_children):
         return f"<!--\n{indented_inner}\n{indent_for_node}-->"
 
 
-
 def element_to_comment(el):
-    """
-    ZAMIANA ELEMENTU NA BLOK KOMENTARZA (ładnie sformatowany).
-    Zostawia komentarz w miejscu elementu, z zachowaniem wcięć i tail.
-    """
     parent = el.getparent()
     idx = parent.index(el)
 
-    indent_for_node, indent_for_children = get_indent(el)
-    comment_text = _make_block_comment_text(el, indent_for_node, indent_for_children)
-    new_comment = etree.Comment(comment_text[4:-3].strip() if comment_text.startswith("<!--") else comment_text)
+    # Zapisz tail elementu (np. "\n    ")
+    old_tail = el.tail
 
-    # Usuń element i wstaw komentarz
-    tail = el.tail  # zachowaj tail
+    # Pobierz oryginalny XML elementu (bez xml_declaration)
+    raw_xml = etree.tostring(el, encoding="unicode", with_tail=False)
+
+    # Wykryj indentację linii komentarza
+    indent_for_node, _ = get_indent(el)
+
+    # Stwórz treść komentarza blokowego bez dodatkowej manipulacji wnętrzem
+    comment_text = f"<!--\n{indent_for_node}{raw_xml}\n{indent_for_node}-->"
+
+    # Stwórz nowy Comment node
+    new_comment = etree.Comment(comment_text[4:-3])  # tniemy <!-- i -->
+
+    # Podmień element na komentarz
     parent.remove(el)
     parent.insert(idx, new_comment)
-    # Dodaj 'ładny' tail (zachowuj istniejący, jeśli był)
-    new_comment.tail = tail if (tail and "\n" in tail) else ("\n" + indent_for_node)
+
+    # Zachowaj tail
+    new_comment.tail = old_tail
 
 
 def try_parse_comment_as_element(comment_node):
-    """
-    Próbuje sparsować treść komentarza jako JEDEN kompletny element XML.
-    Obsługuje komentarz blokowy:
-    <!--
-    <tag> ... </tag>
-    -->
-    oraz komentarz jednoliniowy:
-    <!--<tag>...</tag>-->
-    Zwraca Element lub None.
-    """
     txt = (comment_node.text or "")
     # Oczyść z możliwych markerów nowej linii
     s = txt.strip()
@@ -179,47 +153,27 @@ def try_parse_comment_as_element(comment_node):
 
 
 def replace_comment_with_element(comment_node, element):
-    """
-    ZAMIANA BLOKOWEGO KOMENTARZA NA ELEMENT.
-    - wstaw element w miejscu komentarza,
-    - ustawia mu sensowny .tail,
-    - dopasowuje wcięcia wg sąsiedztwa.
-    """
     parent = comment_node.getparent()
     idx = parent.index(comment_node)
 
-    indent_for_node, indent_for_children = get_indent(comment_node)
-    # Ustaw bazowe wcięcia wnętrza elementu (jeśli ma dzieci)
-    if len(element):
-        element.text = "\n" + indent_for_children
-        element.tail = "\n" + indent_for_node
-        # ustaw tail ostatniego dziecka
-        last = element[-1]
-        last.tail = "\n" + indent_for_node
-    else:
-        # element bez dzieci – zachowaj jedną linię i tail
-        element.tail = "\n" + indent_for_node
+    # Zachowaj tail komentarza (np. "\n    ")
+    old_tail = comment_node.tail
 
-    # podmień
+    # Usuń komentarz i wstaw element
     parent.remove(comment_node)
     parent.insert(idx, element)
 
+    # Zachowaj tail
+    element.tail = old_tail
+
 
 def deep_clone_tree(tree):
-    """
-    Tworzy głęboki klon ElementTree (bez referencji do oryginału),
-    przez serializację i ponowny parse.
-    """
     from lxml import etree as _et
     xml_bytes = _et.tostring(tree, pretty_print=False, xml_declaration=True, encoding="utf-8")
     return _et.ElementTree(_et.fromstring(xml_bytes))
 
 
 def _normalize_comment_node(comment_node):
-    """
-    Jeśli komentarz zawiera <connection-url> lub <security>, przebuduj go
-    do postaci ładnego komentarza blokowego (z wcięciami).
-    """
     el = try_parse_comment_as_element(comment_node)
     if el is None:
         return False
@@ -243,11 +197,6 @@ def _normalize_comment_node(comment_node):
 
 
 def _normalize_live_element(el):
-    """
-    Drobna normalizacja wcięć dla żywych elementów connection-url/security:
-    - element bez dzieci -> .tail = '\n' + indent_this
-    - element z dziećmi -> .text i tail dzieci z wcięciami
-    """
     indent_for_node, indent_for_children = get_indent(el)
     if len(el):
         if not (el.text or "").strip():
@@ -264,11 +213,6 @@ def _normalize_live_element(el):
 
 
 def normalize_xml_structure(tree):
-    """
-    Główna normalizacja:
-    - każdy <connection-url> i <security> w komentarzu -> blokowy komentarz z wcięciami
-    - żywe elementy -> lekkie wyrównanie wcięć
-    """
     root = tree.getroot()
 
     # 1) komentarze -> blokowe
@@ -282,8 +226,45 @@ def normalize_xml_structure(tree):
         if not changed:
             break
 
+    split_adjacent_comments(tree)
+
     # 2) żywe elementy -> wyrównanie
     for cu in findall_any_ns(root, "connection-url"):
         _normalize_live_element(cu)
     for sec in findall_any_ns(root, "security"):
         _normalize_live_element(sec)
+
+def split_adjacent_comments(tree):
+    root = tree.getroot()
+
+    for parent in root.iter():
+        # lxml traktuje komentarze jako "dzieci" tak jak elementy
+        children = list(parent)
+        if not children:
+            continue
+
+        i = 0
+        while i < len(children) - 1:
+            a = children[i]
+            b = children[i + 1]
+
+            # Szukamy par: komentarz obok komentarza
+            is_a_comment = (type(a) is etree._Comment)
+            is_b_comment = (type(b) is etree._Comment)
+
+            if is_a_comment and is_b_comment:
+                # Ustal wcięcie docelowe wg pozycji "b" (drugi komentarz)
+                indent_for_node, _ = get_indent(b)
+
+                # Tail "a" – to separator między a i b
+                tail = a.tail or ""
+                # jeśli nie ma nowej linii, albo tail ma tylko spacje/taby -> wstaw nową linię + indent
+                if "\n" not in tail or tail.strip() == "":
+                    a.tail = "\n" + indent_for_node
+                else:
+                    # jeśli jest nowa linia, ale ostatnia linia nie jest czystym wcięciem -> dopnij poprawne wcięcie
+                    last_line = tail.split("\n")[-1]
+                    if last_line.strip() != "":
+                        a.tail = tail.rstrip() + "\n" + indent_for_node
+                # nic nie ruszamy w "b", jego .tail zostaje jak było
+            i += 1
