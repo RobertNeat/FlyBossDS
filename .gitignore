@@ -39,8 +39,6 @@ htmlcov/
 *.env.*
 .envrc
 
-# === Dane (Twoje wymaganie) ===
-data/
 
 # === Systemowe ===
 .DS_Store

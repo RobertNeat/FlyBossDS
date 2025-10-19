@@ -1,0 +1,49 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<datasources xmlns="http://www.jboss.org/ironjacamar/schema">
+    <datasource jndi-name="java:/jdbc/AppDS1" pool-name="AppDS1Pool" enabled="true" use-java-context="true">
+        <driver>oracle</driver>
+        <!--<connection-url xmlns="http://www.jboss.org/ironjacamar/schema">jdbc:oracle:thin:@192.168.100.10:1521:WAWDB</connection-url>-->
+        <!--Warszawa-->
+        <connection-url>jdbc:oracle:thin:@192.168.100.20:1521:KRKDB</connection-url>
+        <!--Kraków-->
+        <!--<connection-url>jdbc:oracle:thin:@192.168.100.30:1521:GDNDB</connection-url>-->
+        <!--Gdańsk-->
+        <!--<connection-url> jdbc:oracle:thin:@192.168.100.40:1521:WRODB</connection-url>-->
+        <!--Wrocław-->
+        <!--<connection-url xmlns="http://www.jboss.org/ironjacamar/schema">jdbc:oracle:thin:@192.168.100.50:1521:POZDB</connection-url>-->
+        <!--Poznań-->
+        <!--<connection-url xmlns="http://www.jboss.org/ironjacamar/schema">jdbc:oracle:thin:@192.168.100.60:1521:LODDB</connection-url>-->
+        <!--Łódź-->
+        <!--<connection-url xmlns="http://www.jboss.org/ironjacamar/schema">jdbc:oracle:thin:@192.168.100.70:1521:SZZDB</connection-url>-->
+        <!--Szczecin-->
+        <!--<connection-url xmlns="http://www.jboss.org/ironjacamar/schema">jdbc:oracle:thin:@192.168.100.80:1521:LUBDB</connection-url>-->
+        <!--Lublin-->
+        <!--<security>
+                        <user-name xmlns="http://www.jboss.org/ironjacamar/schema">web_admin</user-name>
+                        <password xmlns="http://www.jboss.org/ironjacamar/schema">W3BAdmin</password>
+        </security>-->
+        <!--<security>
+                        <user-name xmlns="http://www.jboss.org/ironjacamar/schema">web_user</user-name>
+                        <password xmlns="http://www.jboss.org/ironjacamar/schema">W3Buser</password>
+        </security>-->
+        <security>
+                        <user-name>web_app</user-name>
+                        <password>W3Bapp</password>
+        </security>
+        <!--
+        <security xmlns="http://www.jboss.org/ironjacamar/schema">
+                <user-name>web_test</user-name>
+                <password>T3STweb</password>
+        </security>
+        -->
+        <validation>
+            <check-valid-connection-sql>SELECT 1 FROM DUAL</check-valid-connection-sql>
+            <background-validation>true</background-validation>
+            <background-validation-millis>60000</background-validation-millis>
+        </validation>
+        <timeout>
+            <blocking-timeout-millis>5000</blocking-timeout-millis>
+            <idle-timeout-minutes>5</idle-timeout-minutes>
+        </timeout>
+    </datasource>
+</datasources>
