@@ -56,5 +56,5 @@ class App(ctk.CTk):
         self.main_view.reload_files()
 
     def _on_theme_changed(self):
-        # Miejsce na dodatkowe reakcje po zmianie motywu
-        pass
+        self.main_view.update_listbox_style()
+        self.settings_view.update_listbox_style()

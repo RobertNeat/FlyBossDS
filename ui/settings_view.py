@@ -24,6 +24,28 @@ class SettingsView(ctk.CTkFrame):
         list_frame.columnconfigure(0, weight=1)
 
         self.paths_list = tk.Listbox(list_frame, selectmode=tk.EXTENDED, height=12)
+
+        # Po utworzeniu self.paths_list (lub self.files_list):
+        if ctk.get_appearance_mode() == "Dark":
+            self.paths_list.configure(
+                bg="#333333",
+                fg="#FFFFFF",
+                selectbackground="#555555",  # lub np. "#1f6aa5" aby pasował do CTk
+                selectforeground="#FFFFFF",
+                highlightthickness=0,
+                borderwidth=0,
+            )
+        else:
+            self.paths_list.configure(
+                bg="#FFFFFF",
+                fg="#000000",
+                selectbackground="#E5E5E5",
+                selectforeground="#000000",
+                highlightthickness=0,
+                borderwidth=0,
+            )
+
+
         self.paths_list.grid(row=0, column=0, sticky="nsew", padx=(10, 5), pady=10)
 
         btns = ctk.CTkFrame(list_frame)
@@ -181,3 +203,9 @@ class SettingsView(ctk.CTkFrame):
         messagebox.showinfo("Informacja", "Zmiana schematu kolorów zadziała w pełni po ponownym uruchomieniu.")
         ctk.set_default_color_theme(theme)
         self.on_theme_changed()
+
+    def update_listbox_style(self):
+        if ctk.get_appearance_mode() == "Dark":
+            self.paths_list.configure(bg="#333333", fg="#FFFFFF", selectbackground="#555555", selectforeground="#FFFFFF")
+        else:
+            self.paths_list.configure(bg="#FFFFFF", fg="#000000", selectbackground="#E5E5E5", selectforeground="#000000")

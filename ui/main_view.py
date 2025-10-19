@@ -46,6 +46,28 @@ class MainView(ctk.CTkFrame):
         list_frame.columnconfigure(0, weight=1)
 
         self.files_list = tk.Listbox(list_frame, height=10)
+
+        # Po utworzeniu self.paths_list (lub self.files_list):
+        if ctk.get_appearance_mode() == "Dark":
+            self.files_list.configure(
+                bg="#333333",
+                fg="#FFFFFF",
+                selectbackground="#555555",  # lub np. "#1f6aa5" aby pasował do CTk
+                selectforeground="#FFFFFF",
+                highlightthickness=0,
+                borderwidth=0,
+            )
+        else:
+            self.files_list.configure(
+                bg="#FFFFFF",
+                fg="#000000",
+                selectbackground="#E5E5E5",
+                selectforeground="#000000",
+                highlightthickness=0,
+                borderwidth=0,
+            )
+
+
         self.files_list.grid(row=0, column=0, sticky="nsew", padx=10, pady=10)
 
         # Przyciski
@@ -151,3 +173,9 @@ class MainView(ctk.CTkFrame):
             txt.configure(state="disabled")
         except Exception as e:
             messagebox.showerror(APP_NAME, f"Błąd podglądu: {e}")
+
+    def update_listbox_style(self):
+        if ctk.get_appearance_mode() == "Dark":
+            self.files_list.configure(bg="#333333", fg="#FFFFFF", selectbackground="#555555", selectforeground="#FFFFFF")
+        else:
+            self.files_list.configure(bg="#FFFFFF", fg="#000000", selectbackground="#E5E5E5", selectforeground="#000000")
