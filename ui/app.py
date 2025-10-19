@@ -11,25 +11,21 @@ class App(ctk.CTk):
         self.title(APP_NAME)
         self.geometry("1000x700")
 
-        # Konfiguracja motywu i koloru z ustawień
         self.settings = SettingsManager()
         ctk.set_appearance_mode(self.settings.data.get("appearance_mode", "System"))
         ctk.set_default_color_theme(self.settings.data.get("color_theme", "blue"))
 
-        self.processor = XMLProcessor()
+        self.processor = XMLProcessor(settings=self.settings)
 
-        # Pasek nawigacji (Segmented Button)
         self.nav = ctk.CTkSegmentedButton(self, values=["Główny", "Ustawienia"], command=self._switch_view)
         self.nav.pack(fill="x", padx=10, pady=10)
         self.nav.set("Główny")
 
-        # Kontener widoków
         self.container = ctk.CTkFrame(self)
         self.container.pack(fill="both", expand=True, padx=10, pady=(0, 10))
         self.container.rowconfigure(0, weight=1)
         self.container.columnconfigure(0, weight=1)
 
-        # Inicjalizacja widoków
         self.main_view = MainView(self.container, self.settings, self.processor)
         self.settings_view = SettingsView(
             self.container,
@@ -38,7 +34,6 @@ class App(ctk.CTk):
             on_theme_changed=self._on_theme_changed
         )
 
-        # Start
         self.current = None
         self._switch_view("Główny")
 
@@ -52,7 +47,6 @@ class App(ctk.CTk):
         self.current.grid(row=0, column=0, sticky="nsew")
 
     def _on_paths_changed(self):
-        # Gdy zmienią się ścieżki w Ustawieniach – odśwież widok główny
         self.main_view.reload_files()
 
     def _on_theme_changed(self):

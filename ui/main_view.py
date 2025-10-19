@@ -19,12 +19,10 @@ class MainView(ctk.CTkFrame):
         self.columnconfigure(0, weight=1)
         self.rowconfigure(2, weight=1)
 
-        # Tytuł
         ctk.CTkLabel(self, text="Zbiorcza konfiguracja źródeł danych", font=ctk.CTkFont(size=18, weight="bold")).grid(
             row=0, column=0, sticky="w", padx=10, pady=(10, 0)
         )
 
-        # Forma wyboru
         form = ctk.CTkFrame(self)
         form.grid(row=1, column=0, sticky="ew", padx=10, pady=10)
         form.columnconfigure(1, weight=1)
@@ -39,7 +37,6 @@ class MainView(ctk.CTkFrame):
         self.user_combo = ctk.CTkComboBox(form, values=[], variable=self.user_var)
         self.user_combo.grid(row=1, column=1, padx=10, pady=10, sticky="ew")
 
-        # Lista plików (readonly)
         list_frame = ctk.CTkFrame(self)
         list_frame.grid(row=2, column=0, sticky="nsew", padx=10, pady=(0, 10))
         list_frame.rowconfigure(0, weight=1)
@@ -47,12 +44,11 @@ class MainView(ctk.CTkFrame):
 
         self.files_list = tk.Listbox(list_frame, height=10)
 
-        # Po utworzeniu self.paths_list (lub self.files_list):
         if ctk.get_appearance_mode() == "Dark":
             self.files_list.configure(
                 bg="#333333",
                 fg="#FFFFFF",
-                selectbackground="#555555",  # lub np. "#1f6aa5" aby pasował do CTk
+                selectbackground="#555555",
                 selectforeground="#FFFFFF",
                 highlightthickness=0,
                 borderwidth=0,
@@ -70,7 +66,6 @@ class MainView(ctk.CTkFrame):
 
         self.files_list.grid(row=0, column=0, sticky="nsew", padx=10, pady=10)
 
-        # Przyciski
         btns = ctk.CTkFrame(self)
         btns.grid(row=3, column=0, sticky="ew", padx=10, pady=10)
 
@@ -151,7 +146,6 @@ class MainView(ctk.CTkFrame):
             target_url = self.url_var.get().strip()
             target_user = self.user_var.get().strip()
 
-            # Podgląd: pracujemy na klonie drzewa
             from core.utils import read_xml
             tree = read_xml(path)
             tree_copy = deep_clone_tree(tree)

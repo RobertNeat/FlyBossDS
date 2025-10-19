@@ -1,3 +1,4 @@
+# python 3.14
 # pip install customtkinter
 # pip install lxml
 # pip install tkinterdnd2

@@ -25,7 +25,6 @@ class SettingsView(ctk.CTkFrame):
 
         self.paths_list = tk.Listbox(list_frame, selectmode=tk.EXTENDED, height=12)
 
-        # Po utworzeniu self.paths_list (lub self.files_list):
         if ctk.get_appearance_mode() == "Dark":
             self.paths_list.configure(
                 bg="#333333",
@@ -44,7 +43,6 @@ class SettingsView(ctk.CTkFrame):
                 highlightthickness=0,
                 borderwidth=0,
             )
-
 
         self.paths_list.grid(row=0, column=0, sticky="nsew", padx=(10, 5), pady=10)
 
@@ -92,6 +90,22 @@ class SettingsView(ctk.CTkFrame):
 
         ctk.CTkLabel(self, text="Domyślnie: System + blue (ciemne tło w trybie system-dark).",
                      font=ctk.CTkFont(size=11, slant="italic")).grid(row=4, column=0, sticky="w", padx=12, pady=(0, 10))
+
+        backup_frame = ctk.CTkFrame(self)
+        backup_frame.grid(row=6, column=0, sticky="ew", padx=10, pady=(0, 10))
+        backup_frame.columnconfigure(1, weight=1)
+
+        ctk.CTkLabel(backup_frame, text="Folder kopii zapasowych:").grid(row=0, column=0, padx=10, pady=(10, 4), sticky="w")
+        self.backup_dir_var = tk.StringVar(value=self.settings.data.get("backup_dir", ""))
+        self.backup_dir_entry = ctk.CTkEntry(backup_frame, textvariable=self.backup_dir_var, placeholder_text="(domyślnie ~/.jw_ds_manager/backups)")
+        self.backup_dir_entry.grid(row=0, column=1, padx=(0, 10), pady=(10, 4), sticky="ew")
+        ctk.CTkButton(backup_frame, text="Wybierz…", command=self._choose_backup_dir).grid(row=0, column=2, padx=10, pady=(10, 4))
+
+        ctk.CTkLabel(backup_frame, text="Maks. liczba kopii na plik:").grid(row=1, column=0, padx=10, pady=(4, 10), sticky="w")
+        self.backup_limit_var = tk.StringVar(value=str(self.settings.data.get("backup_limit", 5)))
+        self.backup_limit_entry = ctk.CTkEntry(backup_frame, textvariable=self.backup_limit_var, width=100)
+        self.backup_limit_entry.grid(row=1, column=1, padx=(0, 10), pady=(4, 10), sticky="w")
+        ctk.CTkButton(backup_frame, text="Zapisz ustawienia kopii", command=self._save_backup_settings).grid(row=1, column=2, padx=10, pady=(4, 10))
 
         self._reload_paths()
 
@@ -199,7 +213,6 @@ class SettingsView(ctk.CTkFrame):
         theme = self.color_theme_var.get()
         self.settings.data["color_theme"] = theme
         self.settings.save()
-        # pełna zmiana koloru w CTk działa najlepiej po restarcie aplikacji
         messagebox.showinfo("Informacja", "Zmiana schematu kolorów zadziała w pełni po ponownym uruchomieniu.")
         ctk.set_default_color_theme(theme)
         self.on_theme_changed()
@@ -209,3 +222,23 @@ class SettingsView(ctk.CTkFrame):
             self.paths_list.configure(bg="#333333", fg="#FFFFFF", selectbackground="#555555", selectforeground="#FFFFFF")
         else:
             self.paths_list.configure(bg="#FFFFFF", fg="#000000", selectbackground="#E5E5E5", selectforeground="#000000")
+
+    def _choose_backup_dir(self):
+        folder = filedialog.askdirectory()
+        if folder:
+            self.backup_dir_var.set(folder)
+
+    def _save_backup_settings(self):
+        bdir = self.backup_dir_var.get().strip()
+        blimit_raw = self.backup_limit_var.get().strip()
+        try:
+            blimit = int(blimit_raw)
+        except Exception:
+            blimit = 5
+        if blimit < 1:
+            blimit = 1
+
+        self.settings.data["backup_dir"] = bdir
+        self.settings.data["backup_limit"] = blimit
+        self.settings.save()
+        messagebox.showinfo("Ustawienia", "Zapisano ustawienia kopii zapasowych.")
