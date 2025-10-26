@@ -1,0 +1,14 @@
+# python3 -m venv venv        <-- utworzenie wirtualnego środowiska
+# source venv/bin/activate     <-- aktywacja środowiska (Linux/Mac)
+# .\venv\Scripts\activate   <-- *aktywacja środowiska (Windows PowerShell)
+# pip install -r requirements.txt  <-- instalacja wymaganych bibliotek
+# deactivate                  <-- wyłączenie środowiska wirtualnego
+
+#  ⚠️ Na Ubuntu konieczne wcześniejsze zainstalowanie venv:
+#  sudo apt install python3.12-venv
+
+customtkinter==5.2.2
+darkdetect==0.8.0
+lxml==6.0.2
+packaging==25.0
+tkinterdnd2==0.4.3
